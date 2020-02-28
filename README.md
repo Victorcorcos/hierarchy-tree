@@ -1,6 +1,6 @@
 # Hierarchy Tree :gem:
 
-A repository dedicated to a ruby gem that shows all the associations related to a desired class.
+A repository dedicated to a ruby gem that shows the whole hierarchy and the associations related to a desired class.
 
 # Why it is necessary?
 
