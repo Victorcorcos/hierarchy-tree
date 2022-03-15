@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name                  = 'hierarchy-tree'
-  s.version               = '0.1.0'
+  s.version               = '0.1.1'
   s.platform              = Gem::Platform::RUBY
   s.authors               = ['Victor Cordeiro Costa']
   s.email                 = ['victorcorcos@gmail.com']
@@ -16,5 +16,5 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'minitest', '~> 5.10'
   s.add_development_dependency 'rake', '~> 12.1'
-  s.add_dependency 'activerecord', '~> 4.2'
+  s.add_dependency 'activerecord', '>=4.2'
 end
