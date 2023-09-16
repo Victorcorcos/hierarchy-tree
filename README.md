@@ -2,9 +2,11 @@
   <img src="https://i.imgur.com/gQlXIBG.png" alt="Hierarchy Tree Logo" width="200" height="200"/>
 </p>
 
+<p align="center">
 A repository dedicated to a ruby gem that shows the whole hierarchy and the associations related to a desired class.
+</p>
 
-# Why it is necessary?
+## Why it is necessary?
 
 Currently, **Rails** doesn't have an easy way to discover the relations among a bunch of ActiveRecord classes.
 
@@ -18,7 +20,7 @@ We need to search inside each one of these files to discover the relations among
 
 With the `hierarchy-tree` gem, it is possible to see this hierarchy ecosystem overview of the classes with ease! :smile:
 
-# Instalation
+## Instalation
 
 Add `hierarchy-tree` to your Gemfile.
 
@@ -26,7 +28,7 @@ Add `hierarchy-tree` to your Gemfile.
 gem 'hierarchy-tree'
 ```
 
-# Usage
+## Usage
 
 1. Just require the `hierarchy_tree` library and use it! (You can test this on `rails console`)
 
@@ -37,7 +39,7 @@ Hierarchy.associations(YourClass) # Array of hashes representing the relations
 Hierarchy.descendants(YourClass) # Array with the descendants elements
 ```
 
-# Example
+## Example
 
 * Imagine you have the following classes with their relations...
 
