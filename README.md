@@ -1,4 +1,6 @@
-# Hierarchy Tree :gem:
+<p align="center">
+  <img src="https://i.imgur.com/gQlXIBG.png" alt="Hierarchy Tree Logo" width="200" height="200"/>
+</p>
 
 A repository dedicated to a ruby gem that shows the whole hierarchy and the associations related to a desired class.
 
