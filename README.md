@@ -111,12 +111,10 @@ The result is...
 - letters
 ```
 
-# Author
+## Contact
 
-Victor Cordeiro Costa
+* [Victor Cordeiro Costa](https://www.linkedin.com/in/victor-costa-0bba7197/)
 
-contact1: victorcorcos@gmail.com
+---
 
-contact2: victor.costa@oxeanbits.com
-
-company: oxeanbits (http://www.oxeanbits.com/)
+*This repository is maintained and developed by [Victor Cordeiro Costa](https://www.linkedin.com/in/victor-costa-0bba7197/). For inquiries, partnerships, or support, don't hesitate to get in touch.
