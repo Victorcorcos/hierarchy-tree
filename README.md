@@ -35,8 +35,8 @@ gem 'hierarchy-tree'
 ```rb
 require 'hierarchy_tree'
 
-Hierarchy.associations(YourClass) # Array of hashes representing the relations
-Hierarchy.descendants(YourClass) # Array with the descendants elements
+Hierarchy.associations(YourClass) # Array of hashes of relations, representing the hierarchy relations as symbols
+Hierarchy.classes_list(YourClass) # Array of classes. Just a list of descendant classes, without representing the relations
 ```
 
 ## Example
