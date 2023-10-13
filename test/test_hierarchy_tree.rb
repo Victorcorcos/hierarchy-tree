@@ -21,6 +21,16 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.associations(Person), [])
   end
 
+  def test_classes_1
+    simulate('Person')
+    simulate('Book')
+    simulate('Word')
+    Person.class_eval { has_many :words, through: :book, autosave: false }
+    Book.class_eval { has_many :words }
+
+    assert_equal(Hierarchy.classes(Person), [])
+  end
+
   def test_classes_list_1
     simulate('Person')
     simulate('Book')
@@ -50,6 +60,14 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.associations(Book), [:page])
   end
 
+  def test_classes_2
+    simulate('Book')
+    simulate('Page')
+    Book.class_eval { has_one :page }
+
+    assert_equal(Hierarchy.classes(Book), ['Page'])
+  end
+
   def test_classes_list_2
     simulate('Book')
     simulate('Page')
@@ -73,6 +91,14 @@ class TestHierarchyTree < Minitest::Test
     Book.class_eval { has_many :pages }
 
     assert_equal(Hierarchy.associations(Book), [:pages])
+  end
+
+  def test_classes_3
+    simulate('Book')
+    simulate('Page')
+    Book.class_eval { has_many :pages }
+
+    assert_equal(Hierarchy.classes(Book), ['Page'])
   end
 
   def test_classes_list_3
@@ -104,6 +130,20 @@ class TestHierarchyTree < Minitest::Test
     Word.class_eval { has_many :letters }
 
     assert_equal(Hierarchy.associations(Book), [{ pages: [{ lines: [{ words: [:letters] }] }] }])
+  end
+
+  def test_classes_4
+    simulate('Book')
+    simulate('Page')
+    simulate('Line')
+    simulate('Word')
+    simulate('Letter')
+    Book.class_eval { has_many :pages }
+    Page.class_eval { has_many :lines }
+    Line.class_eval { has_many :words }
+    Word.class_eval { has_many :letters }
+
+    assert_equal(Hierarchy.classes(Book), [{'Page' => [{'Line' => [{'Word' => ['Letter']}]}]}])
   end
 
   def test_classes_list_4
@@ -171,6 +211,44 @@ class TestHierarchyTree < Minitest::Test
     associations = [pages, lines, words, letters]
 
     assert_equal(Hierarchy.associations(Book), associations)
+  end
+
+  def test_classes_5
+    simulate('Book')
+    simulate('Page')
+    simulate('Line')
+    simulate('Word')
+    simulate('Letter')
+
+    Book.class_eval do
+      has_many :pages
+      has_many :lines
+      has_many :words
+      has_many :letters
+    end
+
+    Page.class_eval do
+      has_many :lines
+      has_many :words
+      has_many :letters
+    end
+
+    Line.class_eval do
+      has_many :words
+      has_many :letters
+    end
+
+    Word.class_eval do
+      has_many :letters
+    end
+
+    letter = 'Letter'
+    words = { 'Word' => [letter] }
+    lines = { 'Line' => [words, letter] }
+    pages = { 'Page' => [lines, words, letter] }
+    classes = [pages, lines, words, letter]
+
+    assert_equal(Hierarchy.classes(Book), classes)
   end
 
   def test_classes_list_5
@@ -247,6 +325,15 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.associations(God), [{ people: [:people] }])
   end
 
+  def test_classes_6_god
+    simulate('God')
+    simulate('Person')
+    God.class_eval { has_many :people }
+    Person.class_eval { has_many :people }
+
+    assert_equal(Hierarchy.classes(God), [{'Person' => ['Person']}])
+  end
+
   def test_classes_list_6_god
     simulate('God')
     simulate('Person')
@@ -272,6 +359,15 @@ class TestHierarchyTree < Minitest::Test
     Person.class_eval { has_many :people }
 
     assert_equal(Hierarchy.associations(Person), [:people])
+  end
+
+  def test_classes_6_person
+    simulate('God')
+    simulate('Person')
+    God.class_eval { has_many :people }
+    Person.class_eval { has_many :people }
+
+    assert_equal(Hierarchy.classes(Person), ['Person'])
   end
 
   def test_classes_list_6_person
@@ -301,6 +397,16 @@ class TestHierarchyTree < Minitest::Test
 
     assert_equal(Hierarchy.associations(Wife), [{ husband: [:wife] }])
     assert_equal(Hierarchy.associations(Husband), [{ wife: [:husband] }])
+  end
+
+  def test_classes_7
+    simulate('Wife')
+    simulate('Husband')
+    Wife.class_eval { has_one :husband }
+    Husband.class_eval { has_one :wife }
+
+    assert_equal(Hierarchy.classes(Wife), [{'Husband' => ['Wife']}])
+    assert_equal(Hierarchy.classes(Husband), [{'Wife' => ['Husband']}])
   end
 
   def test_classes_list_7

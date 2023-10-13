@@ -10,12 +10,12 @@ require 'active_support/core_ext/object/inclusion.rb'
 class Hierarchy
   # Return the full hierarchy starting from the provided class
   def self.associations(klass)
-    build_hierarchy(klass)
+    build_hierarchy(class: klass)
   end
 
   # Return the full hierarchy starting from the provided class
   def self.classes(klass)
-    build_hierarchy(klass)
+    build_hierarchy(class: klass, classes?: true)
   end
 
   # Return an array o
@@ -34,9 +34,9 @@ class Hierarchy
 
   private_class_method
 
-  def self.build_hierarchy(klass)
+  def self.build_hierarchy(opts)
     @cache = {}
-    dfs_hierarchy(class: klass)
+    dfs_hierarchy(opts)
   rescue SystemStackError
     Rails.logger.ap "Infinite loop detected and handled for #{opts[:class]} hierarchy", :warn
     []
