@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name                  = 'hierarchy-tree'
-  s.version               = '0.1.1'
+  s.version               = '0.2.0'
   s.platform              = Gem::Platform::RUBY
   s.authors               = ['Victor Cordeiro Costa']
   s.email                 = ['victorcorcos@gmail.com']

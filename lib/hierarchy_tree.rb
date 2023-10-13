@@ -1,17 +1,28 @@
 require 'active_record'
 require 'active_support/core_ext/object/inclusion.rb'
 
+################ Debug ################
+# rm hierarchy-tree-X.Y.Z.gem
+# gem build hierarchy_tree
+# gem install hierarchy-tree-X.Y.Z.gem
+# ruby -Itest test/test_hierarchy_tree.rb
+
 class Hierarchy
   # Return the full hierarchy starting from the provided class
   def self.associations(klass)
-    build_hierarchy(klass)
+    build_hierarchy(class: klass)
   end
 
-  # Return just the descendant classes of a provided class
-  def self.descendants(klass)
-    @descendants = []
+  # Return the full hierarchy starting from the provided class
+  def self.classes(klass)
+    build_hierarchy(class: klass, classes?: true)
+  end
+
+  # Return an array o
+  def self.classes_list(klass)
+    @classes_list = []
     build_descendants(klass)
-    @descendants
+    @classes_list
   end
 
   def self.loop?(klass)
@@ -23,9 +34,9 @@ class Hierarchy
 
   private_class_method
 
-  def self.build_hierarchy(klass)
+  def self.build_hierarchy(opts)
     @cache = {}
-    dfs_hierarchy(class: klass)
+    dfs_hierarchy(opts)
   rescue SystemStackError
     Rails.logger.ap "Infinite loop detected and handled for #{opts[:class]} hierarchy", :warn
     []
@@ -81,13 +92,13 @@ class Hierarchy
   def self.build_descendants(klass)
     dfs_descendants(class: klass, classes?: true)
   rescue SystemStackError
-    Rails.logger.ap "Infinite loop detected and handled for #{opts[:class]} descendants", :warn
+    Rails.logger.ap "Infinite loop detected and handled for #{opts[:class]} classes_list", :warn
     []
   end
 
   def self.dfs_descendants(opts, klass_name = nil)
-    return if klass_name.in? @descendants
-    @descendants.push(klass_name) if klass_name.present?
+    return if klass_name.in? @classes_list
+    @classes_list.push(klass_name) if klass_name.present?
     children_classes(opts).each do |child_klass, child_name|
       child_opts = { class: child_klass, classes?: opts[:classes?] }
       dfs_descendants(child_opts, child_name)
