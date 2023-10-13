@@ -2,9 +2,9 @@ require 'active_record'
 require 'active_support/core_ext/object/inclusion.rb'
 
 ################ Debug ################
-# rm hierarchy-tree-0.1.2.gem
+# rm hierarchy-tree-X.Y.Z.gem
 # gem build hierarchy_tree
-# gem install hierarchy-tree-0.1.2.gem
+# gem install hierarchy-tree-X.Y.Z.gem
 # ruby -Itest test/test_hierarchy_tree.rb
 
 class Hierarchy
