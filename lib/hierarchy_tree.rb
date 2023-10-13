@@ -13,11 +13,16 @@ class Hierarchy
     build_hierarchy(klass)
   end
 
-  # Return just the descendant classes of a provided class
-  def self.descendants(klass)
-    @descendants = []
+  # Return the full hierarchy starting from the provided class
+  def self.classes(klass)
+    build_hierarchy(klass)
+  end
+
+  # Return an array o
+  def self.classes_list(klass)
+    @classes_list = []
     build_descendants(klass)
-    @descendants
+    @classes_list
   end
 
   def self.loop?(klass)
@@ -87,13 +92,13 @@ class Hierarchy
   def self.build_descendants(klass)
     dfs_descendants(class: klass, classes?: true)
   rescue SystemStackError
-    Rails.logger.ap "Infinite loop detected and handled for #{opts[:class]} descendants", :warn
+    Rails.logger.ap "Infinite loop detected and handled for #{opts[:class]} classes_list", :warn
     []
   end
 
   def self.dfs_descendants(opts, klass_name = nil)
-    return if klass_name.in? @descendants
-    @descendants.push(klass_name) if klass_name.present?
+    return if klass_name.in? @classes_list
+    @classes_list.push(klass_name) if klass_name.present?
     children_classes(opts).each do |child_klass, child_name|
       child_opts = { class: child_klass, classes?: opts[:classes?] }
       dfs_descendants(child_opts, child_name)

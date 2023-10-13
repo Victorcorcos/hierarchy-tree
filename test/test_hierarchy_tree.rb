@@ -21,14 +21,14 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.associations(Person), [])
   end
 
-  def test_descendants_1
+  def test_classes_list_1
     simulate('Person')
     simulate('Book')
     simulate('Word')
     Person.class_eval { has_many :words, through: :book, autosave: false }
     Book.class_eval { has_many :words }
 
-    assert_equal(Hierarchy.descendants(Person), [])
+    assert_equal(Hierarchy.classes_list(Person), [])
   end
 
   def test_loop_1
@@ -50,12 +50,12 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.associations(Book), [:page])
   end
 
-  def test_descendants_2
+  def test_classes_list_2
     simulate('Book')
     simulate('Page')
     Book.class_eval { has_one :page }
 
-    assert_equal(Hierarchy.descendants(Book), %w[Page])
+    assert_equal(Hierarchy.classes_list(Book), %w[Page])
   end
 
   def test_loop_2
@@ -75,12 +75,12 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.associations(Book), [:pages])
   end
 
-  def test_descendants_3
+  def test_classes_list_3
     simulate('Book')
     simulate('Page')
     Book.class_eval { has_many :pages }
 
-    assert_equal(Hierarchy.descendants(Book), %w[Page])
+    assert_equal(Hierarchy.classes_list(Book), %w[Page])
   end
 
   def test_loop_3
@@ -106,7 +106,7 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.associations(Book), [{ pages: [{ lines: [{ words: [:letters] }] }] }])
   end
 
-  def test_descendants_4
+  def test_classes_list_4
     simulate('Book')
     simulate('Page')
     simulate('Line')
@@ -117,7 +117,7 @@ class TestHierarchyTree < Minitest::Test
     Line.class_eval { has_many :words }
     Word.class_eval { has_many :letters }
 
-    assert_equal(Hierarchy.descendants(Book), %w[Page Line Word Letter])
+    assert_equal(Hierarchy.classes_list(Book), %w[Page Line Word Letter])
   end
 
   def test_loop_4
@@ -173,7 +173,7 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.associations(Book), associations)
   end
 
-  def test_descendants_5
+  def test_classes_list_5
     simulate('Book')
     simulate('Page')
     simulate('Line')
@@ -202,7 +202,7 @@ class TestHierarchyTree < Minitest::Test
       has_many :letters
     end
 
-    assert_equal(Hierarchy.descendants(Book), %w[Page Line Word Letter])
+    assert_equal(Hierarchy.classes_list(Book), %w[Page Line Word Letter])
   end
 
   def test_loop_5
@@ -247,13 +247,13 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.associations(God), [{ people: [:people] }])
   end
 
-  def test_descendants_6_god
+  def test_classes_list_6_god
     simulate('God')
     simulate('Person')
     God.class_eval { has_many :people }
     Person.class_eval { has_many :people }
 
-    assert_equal(Hierarchy.descendants(God), %w[Person])
+    assert_equal(Hierarchy.classes_list(God), %w[Person])
   end
 
   def test_loop_6_god
@@ -274,13 +274,13 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.associations(Person), [:people])
   end
 
-  def test_descendants_6_person
+  def test_classes_list_6_person
     simulate('God')
     simulate('Person')
     God.class_eval { has_many :people }
     Person.class_eval { has_many :people }
 
-    assert_equal(Hierarchy.descendants(Person), %w[Person])
+    assert_equal(Hierarchy.classes_list(Person), %w[Person])
   end
 
   def test_loop_6_person
@@ -303,14 +303,14 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.associations(Husband), [{ wife: [:husband] }])
   end
 
-  def test_descendants_7
+  def test_classes_list_7
     simulate('Wife')
     simulate('Husband')
     Wife.class_eval { has_one :husband }
     Husband.class_eval { has_one :wife }
 
-    assert_equal(Hierarchy.descendants(Wife), %w[Husband Wife])
-    assert_equal(Hierarchy.descendants(Husband), %w[Wife Husband])
+    assert_equal(Hierarchy.classes_list(Wife), %w[Husband Wife])
+    assert_equal(Hierarchy.classes_list(Husband), %w[Wife Husband])
   end
 
   def test_loop_7
