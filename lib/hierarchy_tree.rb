@@ -1,6 +1,12 @@
 require 'active_record'
 require 'active_support/core_ext/object/inclusion.rb'
 
+################ Debug ################
+# rm hierarchy-tree-0.1.2.gem
+# gem build hierarchy_tree
+# gem install hierarchy-tree-0.1.2.gem
+# ruby -Itest test/test_hierarchy_tree.rb
+
 class Hierarchy
   # Return the full hierarchy starting from the provided class
   def self.associations(klass)
