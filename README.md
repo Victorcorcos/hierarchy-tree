@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.imgur.com/gQlXIBG.png" alt="Hierarchy Tree Logo" width="300" height="300"/>
+  <img src="https://i.imgur.com/gQlXIBG.png" alt="Hierarchy Tree Logo" width="200" height="200"/>
 </p>
 
 <p align="center">
@@ -35,8 +35,9 @@ gem 'hierarchy-tree'
 ```rb
 require 'hierarchy_tree'
 
-Hierarchy.associations(YourClass) # Array of hashes representing the relations
-Hierarchy.descendants(YourClass) # Array with the descendants elements
+Hierarchy.associations(YourClass) # Array of hashes of relations → Representing the hierarchy symbolized relations
+Hierarchy.classes_list(YourClass) # Array of classes → Just a list of descendant classes, without representing the relations
+Hierarchy.classes(YourClass)      # Array of hashes of classes → Representing the hierarchy of relations as stringified classes instead of symbolized relations
 ```
 
 ## Example
@@ -111,12 +112,10 @@ The result is...
 - letters
 ```
 
-# Author
+## Contact
 
-Victor Cordeiro Costa
+* [Victor Cordeiro Costa](https://www.linkedin.com/in/victor-costa-0bba7197/)
 
-contact1: victorcorcos@gmail.com
+---
 
-contact2: victor.costa@oxeanbits.com
-
-company: oxeanbits (http://www.oxeanbits.com/)
+*This repository is maintained and developed by [Victor Cordeiro Costa](https://www.linkedin.com/in/victor-costa-0bba7197/). For inquiries, partnerships, or support, don't hesitate to get in touch.
