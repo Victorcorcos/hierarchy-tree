@@ -38,6 +38,7 @@ require 'hierarchy_tree'
 Hierarchy.associations(YourClass) # Array of hashes of relations → Representing the hierarchy symbolized relations
 Hierarchy.classes_list(YourClass) # Array of classes → Just a list of descendant classes, without representing the relations
 Hierarchy.classes(YourClass)      # Array of hashes of classes → Representing the hierarchy of relations as stringified classes instead of symbolized relations
+Hierarchy.ancestors(from: ChildClass, to: AncestorClass) # Array of hashes of relations → Representing the ancestors hierarchy starting from the ChildClass until it reaches AncestorClass
 ```
 
 ## Example

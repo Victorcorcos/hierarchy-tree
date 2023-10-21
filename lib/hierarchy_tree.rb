@@ -25,6 +25,26 @@ class Hierarchy
     @classes_list
   end
 
+  # Return the ancestors by navigating thorough :belongs_to, starting from the "from" class aiming the "to" class.
+  def self.ancestors(from:, to:, descendants: [])
+    return to.model_name.param_key.to_sym if from == to # Path is found
+
+    return 'loop' if from.in? descendants # Avoids cycle
+
+    descendants.push(from)
+
+    from.reflect_on_all_associations(:belongs_to).map do |relation|
+      if relation.klass == to
+        relation.name
+      else
+        path = ancestors(from: relation.klass, to: to, descendants: descendants)
+        if valid_path?(path, to.model_name.param_key.to_sym)
+          return { relation.name => path }
+        end
+      end
+    end.compact.first
+  end
+
   def self.loop?(klass)
     @cache = {}
     false if dfs_hierarchy(class: klass, classes?: false)
@@ -104,5 +124,18 @@ class Hierarchy
       dfs_descendants(child_opts, child_name)
     end
     true
+  end
+
+  def self.valid_path?(path, target)
+    return true if path == target
+
+    case path
+    when Array
+      path.any? { |sub_path| valid_path?(sub_path, target) }
+    when Hash
+      path.values.any? { |value| valid_path?(value, target) }
+    else
+      false
+    end
   end
 end
