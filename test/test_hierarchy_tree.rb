@@ -428,4 +428,43 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.loop?(Wife), false)
     assert_equal(Hierarchy.loop?(Husband), false)
   end
+
+  def test_ancestors
+    simulate('Child')
+    simulate('Parent1')
+    simulate('Parent2')
+    simulate('Parent3')
+    simulate('GrandParent4')
+    simulate('GrandParent5')
+    simulate('GrandParent6')
+    simulate('God')
+    simulate('Edimar')
+
+    # Child ➙ Parent1 ➙ GrandParent4 ➙ God ➙ Edimar
+    #       ↳ Parent2 ➙ GrandParent5 ──────➚
+    #       ↳ Parent3 ➙ GrandParent6 ↺ Child
+    Child.class_eval { belongs_to :parent1 }
+    Child.class_eval { belongs_to :parent2 }
+    Child.class_eval { belongs_to :parent3 }
+    Parent1.class_eval { belongs_to :grand_parent4 }
+    Parent2.class_eval { belongs_to :grand_parent5 }
+    Parent3.class_eval { belongs_to :grand_parent6 }
+    GrandParent4.class_eval { belongs_to :god }
+    GrandParent5.class_eval { belongs_to :edimar }
+    GrandParent6.class_eval { belongs_to :child }
+    God.class_eval { belongs_to :edimar }
+
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent1), :parent1)
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent2), :parent2)
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent3), :parent3)
+    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent4), { parent1: :grand_parent4 })
+    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent5), { parent2: :grand_parent5 })
+    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent6), { parent3: :grand_parent6 })
+    assert_equal(Hierarchy.ancestors(from: Child, to: God), { parent1: { grand_parent4: :god } })
+    to_edimar = { parent1: { grand_parent4: { god: :edimar } } }
+    assert_equal(Hierarchy.ancestors(from: Child, to: Edimar), to_edimar)
+
+    assert_nil(Hierarchy.ancestors(from: Edimar, to: Child))
+    assert_nil(Hierarchy.ancestors(from: Child, to: Child))
+  end
 end
