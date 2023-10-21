@@ -30,7 +30,6 @@ class Hierarchy
   def self.ancestors(from:, to:, descendants: [])
     return if from == to and descendants == [] # Base case
     return to.model_name.param_key.to_sym if from == to # Path is found
-
     return 'loop' if from.in? descendants # Avoids cycle
 
     descendants.push(from)
