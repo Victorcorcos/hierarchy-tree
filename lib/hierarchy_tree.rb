@@ -28,6 +28,7 @@ class Hierarchy
   # Return the ancestors by navigating thorough :belongs_to
   # Starting from the "from" class navigating to the "to" class
   def self.ancestors(from:, to:, descendants: [])
+    return if from == to and descendants == [] # Base case
     return to.model_name.param_key.to_sym if from == to # Path is found
 
     return 'loop' if from.in? descendants # Avoids cycle
