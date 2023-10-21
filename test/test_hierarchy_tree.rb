@@ -6,7 +6,7 @@ require 'active_support/core_ext/object/inclusion.rb'
 
 class TestHierarchyTree < Minitest::Test
   def simulate(klass)
-    Object.send(:remove_const, klass) if defined? klass.constantize
+    Object.send(:remove_const, klass) if Object.const_defined?(klass)
     Object.const_set(klass, Class.new(ActiveRecord::Base))
   end
 
