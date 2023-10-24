@@ -2,6 +2,7 @@ require 'active_record'
 require 'active_support/core_ext/object/inclusion.rb'
 
 ################ Debug ################
+# gem uninstall hierarchy-tree -v X.Y.Z
 # rm hierarchy-tree-X.Y.Z.gem
 # gem build hierarchy_tree
 # gem install hierarchy-tree-X.Y.Z.gem
