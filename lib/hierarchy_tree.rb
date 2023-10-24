@@ -25,25 +25,51 @@ class Hierarchy
     @classes_list
   end
 
-  # Return the ancestors by navigating thorough :belongs_to
-  # Starting from the "from" class navigating to the "to" class
-  def self.ancestors(from:, to:, descendants: [])
-    return if from == to and descendants == [] # Base case
-    return to.model_name.param_key.to_sym if from == to # Path is found
+  # Return the ancestors by navigating through :belongs_to
+  # Starting from the "from" class towards the "to" class
+  # Using DFS - Depth First Search, thus finding the Deepest Path (more likely)
+  def self.ancestors_dfs(from:, to:, descendants: [])
+    return if from.to_s == to.to_s and descendants == [] # Base case
     return 'loop' if from.in? descendants # Avoids cycle
 
     descendants.push(from)
 
     from.reflect_on_all_associations(:belongs_to).map do |relation|
-      if relation.klass == to
-        relation.name
+      if relation.klass.to_s == to.to_s
+        relation.name # Path is found
       else
-        path = ancestors(from: relation.klass, to: to, descendants: descendants)
-        if valid_path?(path, to.model_name.param_key.to_sym)
-          return { relation.name => path }
-        end
+        path = ancestors_dfs(from: relation.klass, to: to, descendants: descendants)
+        return { relation.name => path } if valid_path?(path, to.model_name.param_key.to_sym)
       end
     end.compact.first
+  end
+
+  # Return the ancestors by navigating through :belongs_to
+  # Starting from the "from" class towards the "to" class
+  # Using BFS - Breadth First Search, thus finding the Shortest Path
+  def self.ancestors_bfs(from:, to:)
+    return if from == to
+
+    queue = [{ class: from, path: [] }]
+    visited = [from]
+
+    while queue.any?
+      current = queue.shift
+      current_class = current[:class]
+      current_path = current[:path]
+
+      current_class.reflect_on_all_associations(:belongs_to).each do |relation|
+        next_class = relation.klass
+        next_path = current_path + [relation.name]
+
+        return hashify(next_path) if next_class.to_s == to.to_s
+
+        if visited.exclude?(next_class)
+          visited << next_class
+          queue.push({ class: next_class, path: next_path })
+        end
+      end
+    end
   end
 
   def self.loop?(klass)
@@ -137,6 +163,14 @@ class Hierarchy
       path.values.any? { |value| valid_path?(value, target) }
     else
       false
+    end
+  end
+
+  def self.hashify(array)
+    if array.length == 1
+      array.first
+    else
+      { array.first => hashify(array.drop(1)) }
     end
   end
 end
