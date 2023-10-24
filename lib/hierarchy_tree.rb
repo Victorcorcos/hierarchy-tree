@@ -9,12 +9,12 @@ require 'active_support/core_ext/object/inclusion.rb'
 # ruby -Itest test/test_hierarchy_tree.rb
 
 class Hierarchy
-  # Return the full hierarchy starting from the provided class
+  # Return the full hierarchy as associations starting from the provided class
   def self.associations(klass)
     build_hierarchy(class: klass)
   end
 
-  # Return the full hierarchy starting from the provided class
+  # Return the full hierarchy as classes starting from the provided class
   def self.classes(klass)
     build_hierarchy(class: klass, classes?: true)
   end
@@ -26,7 +26,7 @@ class Hierarchy
     @classes_list
   end
 
-  # Return the ancestors by navigating through :belongs_to
+  # Return the ancestors associations by navigating through :belongs_to
   # Starting from the "from" class towards the "to" class
   # Using DFS - Depth First Search, thus finding the Deepest Path (more likely)
   def self.ancestors_dfs(from:, to:, descendants: [])
@@ -42,7 +42,7 @@ class Hierarchy
     end.compact.first
   end
 
-  # Return the ancestors by navigating through :belongs_to
+  # Return the ancestors associations by navigating through :belongs_to
   # Starting from the "from" class towards the "to" class
   # Using BFS - Breadth First Search, thus finding the Shortest Path
   def self.ancestors_bfs(from:, to:)
