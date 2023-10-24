@@ -38,7 +38,8 @@ require 'hierarchy_tree'
 Hierarchy.associations(YourClass) # Array of hashes of relations → Representing the hierarchy symbolized relations
 Hierarchy.classes_list(YourClass) # Array of classes → Just a list of descendant classes, without representing the relations
 Hierarchy.classes(YourClass)      # Array of hashes of classes → Representing the hierarchy of relations as stringified classes instead of symbolized relations
-Hierarchy.ancestors(from: ChildClass, to: AncestorClass) # Hash of relations → Representing the ancestors hierarchy starting from the ChildClass until it reaches AncestorClass
+Hierarchy.ancestors_dfs(from: ChildClass, to: AncestorClass) # Hash of relations → Representing the ancestors hierarchy starting from the ChildClass until it reaches AncestorClass searching by Depth First Search
+Hierarchy.ancestors_bfs(from: ChildClass, to: AncestorClass) # Hash of relations → Representing the ancestors hierarchy starting from the ChildClass until it reaches AncestorClass searching by Breadth First Search
 ```
 
 ## Example
@@ -79,11 +80,20 @@ end
 * Then, you can run the following commands (Please, don't forget to `require 'hierarchy_tree'`)
 
 ```rb
-Hierarchy.descendants(Book)
+Hierarchy.associations(Book)
+# [:pages, {:lines=>[{:words=>[:letters]}]}, {:words=>[:letters]}, :letters]
+
+Hierarchy.classes(Book)
+# ["Page", {"Line"=>[{"Word"=>["Letter"]}]}, {"Word"=>["Letter"]}, "Letter"]
+
+Hierarchy.classes_list(Book)
 # ["Page", "Line", "Word", "Letter"]
 
-Hierarchy.associations(Book)
-# [{:pages=>[{:lines=>[{:words=>[:letters]}, :letters]}, {:words=>[:letters]}, :letters]}, {:lines=>[{:words=>[:letters]}, :letters]}, {:words=>[:letters]}, :letters]
+Hierarchy.ancestors_dfs(from: Letter, to: Book)
+# TODO: Why it doesn't work
+
+Hierarchy.ancestors_bfs(from: Letter, to: Book)
+# {:word=>{:line=>{:page=>:book}}}
 ```
 
 * A nice way to display the associations is through the *YAML* format [without aliases](https://stackoverflow.com/questions/3981128/ruby-yaml-write-without-aliases/3990318)
