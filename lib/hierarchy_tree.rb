@@ -36,12 +36,9 @@ class Hierarchy
     descendants.push(from)
 
     from.reflect_on_all_associations(:belongs_to).map do |relation|
-      if relation.klass.to_s == to.to_s
-        relation.name # Path is found
-      else
-        path = ancestors_dfs(from: relation.klass, to: to, descendants: descendants)
-        return { relation.name => path } if valid_path?(path, to.model_name.param_key.to_sym)
-      end
+      return relation.name if relation.klass.to_s == to.to_s # Path is found
+      path = ancestors_dfs(from: relation.klass, to: to, descendants: descendants)
+      return { relation.name => path } if valid_path?(path, to.model_name.param_key.to_sym)
     end.compact.first
   end
 
