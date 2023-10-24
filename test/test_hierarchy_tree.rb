@@ -2,7 +2,7 @@ require 'minitest/autorun'
 require 'hierarchy_tree'
 require 'active_record'
 require 'active_support/core_ext/object/inclusion.rb'
-# require 'pry' # For debugging purposes
+# require 'pry-byebug' # For debugging purposes
 
 class TestHierarchyTree < Minitest::Test
   def simulate(klass)
