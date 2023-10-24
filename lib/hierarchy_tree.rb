@@ -19,7 +19,7 @@ class Hierarchy
     build_hierarchy(class: klass, classes?: true)
   end
 
-  # Return an array o
+  # Return the array of children classes
   def self.classes_list(klass)
     @classes_list = []
     build_descendants(klass)
