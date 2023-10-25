@@ -90,7 +90,7 @@ Hierarchy.classes_list(Book)
 # ["Page", "Line", "Word", "Letter"]
 
 Hierarchy.ancestors_dfs(from: Letter, to: Book)
-# TODO: Why it doesn't work
+# {:word=>{:line=>{:page=>:book}}}
 
 Hierarchy.ancestors_bfs(from: Letter, to: Book)
 # {:word=>{:line=>{:page=>:book}}}
