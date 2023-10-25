@@ -459,21 +459,19 @@ class TestHierarchyTree < Minitest::Test
   def test_all_ancestors
     setup_ancestors
 
-    assert_equal(Hierarchy.ancestors(from: Child, to: Parent1), [:parent1, {:parent3=>{:grand_parent6=>{:child=>:parent1}}}])
-    assert_equal(Hierarchy.ancestors(from: Child, to: Parent2), [:parent2, {:parent3=>{:grand_parent6=>{:child=>:parent2}}}])
-    assert_equal(Hierarchy.ancestors(from: Child, to: Parent3), [:parent3, {:parent3=>{:grand_parent6=>{:child=>:parent3}}}])
-    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent4), [{:parent1=>:grand_parent4}, {:parent3=>{:grand_parent6=>{:child=>{:parent1=>:grand_parent4}}}}])
-    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent5), [{:parent2=>:grand_parent5}, {:parent3=>{:grand_parent6=>{:child=>{:parent2=>:grand_parent5}}}}])
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent1), [:parent1])
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent2), [:parent2])
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent3), [:parent3])
+    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent4), [{:parent1=>:grand_parent4}])
+    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent5), [{:parent2=>:grand_parent5}])
     assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent6), [{:parent3=>:grand_parent6}])
-    assert_equal(Hierarchy.ancestors(from: Child, to: God), [{:parent1=>{:grand_parent4=>:god}}, {:parent3=>{:grand_parent6=>{:child=>{:parent1=>{:grand_parent4=>:god}}}}}])
+    assert_equal(Hierarchy.ancestors(from: Child, to: God), [{:parent1=>{:grand_parent4=>:god}}])
 
     # Multiple Paths
     paths = [
       {:parent3=>:edimar},
       {:parent2=>{:grand_parent5=>:edimar}},
-      {:parent1=>{:grand_parent4=>{:god=>:edimar}}},
-      {:parent3=>{:grand_parent6=>{:child=>{:parent2=>{:grand_parent5=>:edimar}}}}},
-      {:parent3=>{:grand_parent6=>{:child=>{:parent1=>{:grand_parent4=>{:god=>:edimar}}}}}}
+      {:parent1=>{:grand_parent4=>{:god=>:edimar}}}
     ]
     assert_equal(Hierarchy.ancestors(from: Child, to: Edimar), paths)
 
