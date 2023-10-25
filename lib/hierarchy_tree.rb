@@ -26,20 +26,36 @@ class Hierarchy
     @classes_list
   end
 
-  # Return the ancestors associations by navigating through :belongs_to
+  # Return all the possible ancestors associations by navigating through :belongs_to
   # Starting from the "from" class towards the "to" class
-  # Using DFS - Depth First Search, thus finding the Deepest Path (more likely)
-  def self.ancestors_dfs(from:, to:, descendants: [])
-    return if from.to_s == to.to_s and descendants == [] # Base case
-    return 'loop' if from.in? descendants # Avoids cycle
+  def self.all_ancestors(from:, to:)
+    return [] if from == to
 
-    descendants.push(from)
+    queue = [{ class: from, path: [] }]
+    visited = { from => [] }
+    paths = []
 
-    from.reflect_on_all_associations(:belongs_to).map do |relation|
-      return relation.name if relation.klass.to_s == to.to_s # Path is found
-      path = ancestors_dfs(from: relation.klass, to: to, descendants: descendants)
-      return { relation.name => path } if valid_path?(path, to.model_name.param_key.to_sym)
-    end.compact.first
+    while queue.any?
+      current = queue.shift
+      current_class = current[:class]
+      current_path = current[:path]
+
+      current_class.reflect_on_all_associations(:belongs_to).each do |relation|
+        next_class = relation.klass
+        next_path = current_path + [relation.name]
+
+        if next_class.to_s == to.to_s
+          paths << hashify(next_path)
+        end
+
+        if !visited.key?(next_class)
+          visited[next_class] = next_path
+          queue.push({ class: next_class, path: next_path })
+        end
+      end
+    end
+
+    paths
   end
 
   # Return the ancestors associations by navigating through :belongs_to
@@ -68,6 +84,22 @@ class Hierarchy
         end
       end
     end
+  end
+
+  # Return the ancestors associations by navigating through :belongs_to
+  # Starting from the "from" class towards the "to" class
+  # Using DFS - Depth First Search, thus finding the Deepest Path (more likely)
+  def self.ancestors_dfs(from:, to:, descendants: [])
+    return if from.to_s == to.to_s and descendants == [] # Base case
+    return 'loop' if from.in? descendants # Avoids cycle
+
+    descendants.push(from)
+
+    from.reflect_on_all_associations(:belongs_to).map do |relation|
+      return relation.name if relation.klass.to_s == to.to_s # Path is found
+      path = ancestors_dfs(from: relation.klass, to: to, descendants: descendants)
+      return { relation.name => path } if valid_path?(path, to.model_name.param_key.to_sym)
+    end.compact.first
   end
 
   def self.loop?(klass)
@@ -151,6 +183,14 @@ class Hierarchy
     true
   end
 
+  def self.hashify(array)
+    if array.length == 1
+      array.first
+    else
+      { array.first => hashify(array.drop(1)) }
+    end
+  end
+
   def self.valid_path?(path, target)
     return true if path == target
 
@@ -161,14 +201,6 @@ class Hierarchy
       path.values.any? { |value| valid_path?(value, target) }
     else
       false
-    end
-  end
-
-  def self.hashify(array)
-    if array.length == 1
-      array.first
-    else
-      { array.first => hashify(array.drop(1)) }
     end
   end
 end
