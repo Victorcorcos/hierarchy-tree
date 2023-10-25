@@ -2,11 +2,11 @@ require 'minitest/autorun'
 require 'hierarchy_tree'
 require 'active_record'
 require 'active_support/core_ext/object/inclusion.rb'
-# require 'pry' # For debugging purposes
+# require 'pry-byebug' # For debugging purposes
 
 class TestHierarchyTree < Minitest::Test
   def simulate(klass)
-    Object.send(:remove_const, klass) if defined? klass.contantize
+    Object.send(:remove_const, klass) if Object.const_defined?(klass)
     Object.const_set(klass, Class.new(ActiveRecord::Base))
   end
 
@@ -427,5 +427,144 @@ class TestHierarchyTree < Minitest::Test
 
     assert_equal(Hierarchy.loop?(Wife), false)
     assert_equal(Hierarchy.loop?(Husband), false)
+  end
+
+  def setup_ancestors
+    simulate('Child')
+    simulate('Parent1')
+    simulate('Parent2')
+    simulate('Parent3')
+    simulate('GrandParent4')
+    simulate('GrandParent5')
+    simulate('GrandParent6')
+    simulate('God')
+    simulate('Edimar')
+
+    # Child ➙ Parent1 ➙ GrandParent4 ➙ God ─↘
+    #       ↳ Parent2 ➙ GrandParent5 ───────➙ Edimar
+    #       ↳ Parent3 ➙ GrandParent6 ↺ Child
+    #               ∟───────────────────────➚
+    Child.class_eval { belongs_to :parent1 }
+    Child.class_eval { belongs_to :parent2 }
+    Child.class_eval { belongs_to :parent3 }
+    Parent1.class_eval { belongs_to :grand_parent4 }
+    Parent2.class_eval { belongs_to :grand_parent5 }
+    Parent3.class_eval { belongs_to :grand_parent6; belongs_to :edimar }
+    GrandParent4.class_eval { belongs_to :god }
+    GrandParent5.class_eval { belongs_to :edimar }
+    GrandParent6.class_eval { belongs_to :child }
+    God.class_eval { belongs_to :edimar }
+  end
+
+  def test_all_ancestors
+    setup_ancestors
+
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent1), [:parent1])
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent2), [:parent2])
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent3), [:parent3])
+    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent4), [{ parent1: :grand_parent4 }])
+    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent5), [{ parent2: :grand_parent5 }])
+    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent6), [{ parent3: :grand_parent6 }])
+    assert_equal(Hierarchy.ancestors(from: Child, to: God), [{ parent1: { grand_parent4: :god } }])
+
+    # Multiple Paths
+    paths = [
+      { parent3: :edimar },
+      { parent2: { grand_parent5: :edimar } },
+      { parent1: { grand_parent4: { god: :edimar } } }
+    ]
+    assert_equal(Hierarchy.ancestors(from: Child, to: Edimar), paths)
+
+    assert_equal(Hierarchy.ancestors(from: Edimar, to: Child), [])
+    assert_equal(Hierarchy.ancestors(from: Child, to: Child), [])
+  end
+
+  def test_ancestors_dfs
+    setup_ancestors
+
+    assert_equal(Hierarchy.ancestors_dfs(from: Child, to: Parent1), :parent1)
+    assert_equal(Hierarchy.ancestors_dfs(from: Child, to: Parent2), :parent2)
+    assert_equal(Hierarchy.ancestors_dfs(from: Child, to: Parent3), :parent3)
+    assert_equal(Hierarchy.ancestors_dfs(from: Child, to: GrandParent4), { parent1: :grand_parent4 })
+    assert_equal(Hierarchy.ancestors_dfs(from: Child, to: GrandParent5), { parent2: :grand_parent5 })
+    assert_equal(Hierarchy.ancestors_dfs(from: Child, to: GrandParent6), { parent3: :grand_parent6 })
+    assert_equal(Hierarchy.ancestors_dfs(from: Child, to: God), { parent1: { grand_parent4: :god } })
+
+    # Deepest Path
+    assert_equal(Hierarchy.ancestors_dfs(from: Child, to: Edimar), { parent1: { grand_parent4: { god: :edimar } } })
+
+    assert_nil(Hierarchy.ancestors_dfs(from: Edimar, to: Child))
+    assert_nil(Hierarchy.ancestors_dfs(from: Child, to: Child))
+  end
+
+  def test_ancestors_bfs
+    setup_ancestors
+
+    assert_equal(Hierarchy.ancestors_bfs(from: Child, to: Parent1), :parent1)
+    assert_equal(Hierarchy.ancestors_bfs(from: Child, to: Parent2), :parent2)
+    assert_equal(Hierarchy.ancestors_bfs(from: Child, to: Parent3), :parent3)
+    assert_equal(Hierarchy.ancestors_bfs(from: Child, to: GrandParent4), { parent1: :grand_parent4 })
+    assert_equal(Hierarchy.ancestors_bfs(from: Child, to: GrandParent5), { parent2: :grand_parent5 })
+    assert_equal(Hierarchy.ancestors_bfs(from: Child, to: GrandParent6), { parent3: :grand_parent6 })
+    assert_equal(Hierarchy.ancestors_bfs(from: Child, to: God), { parent1: { grand_parent4: :god } })
+
+    # Shortest Path
+    assert_equal(Hierarchy.ancestors_bfs(from: Child, to: Edimar), { parent3: :edimar })
+
+    assert_nil(Hierarchy.ancestors_bfs(from: Edimar, to: Child))
+    assert_nil(Hierarchy.ancestors_bfs(from: Child, to: Child))
+  end
+
+  def test_readme_example
+    simulate('Book')
+    simulate('Page')
+    simulate('Line')
+    simulate('Word')
+    simulate('Letter')
+
+    Book.class_eval do
+      has_many :pages
+      has_many :words
+    end
+
+    Page.class_eval do
+      belongs_to :book
+      has_many :lines
+      has_many :words
+    end
+
+    Line.class_eval do
+      belongs_to :page
+      has_many :words
+    end
+
+    Word.class_eval do
+      belongs_to :line
+      belongs_to :page
+      belongs_to :book
+      has_many :letters
+    end
+
+    Letter.class_eval do
+      belongs_to :word
+    end
+
+    associations = [{:pages=>[{:lines=>[{:words=>[:letters]}]}, {:words=>[:letters]}]}, {:words=>[:letters]}]
+    assert_equal(Hierarchy.associations(Book), associations)
+
+    classes = [{"Page"=>[{"Line"=>[{"Word"=>["Letter"]}]}, {"Word"=>["Letter"]}]}, {"Word"=>["Letter"]}]
+    assert_equal(Hierarchy.classes(Book), classes)
+
+    classes_list = ["Page", "Line", "Word", "Letter"]
+    assert_equal(Hierarchy.classes_list(Book), classes_list)
+
+    ancestors = [{:word=>:book}, {:word=>{:page=>:book}}]
+    assert_equal(Hierarchy.ancestors(from: Letter, to: Book), ancestors)
+
+    ancestors_dfs = {:word=>{:line=>{:page=>:book}}}
+    assert_equal(Hierarchy.ancestors_dfs(from: Letter, to: Book), ancestors_dfs)
+
+    ancestors_bfs = {:word=>:book}
+    assert_equal(Hierarchy.ancestors_bfs(from: Letter, to: Book), ancestors_bfs)
   end
 end
