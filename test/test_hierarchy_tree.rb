@@ -514,4 +514,57 @@ class TestHierarchyTree < Minitest::Test
     assert_nil(Hierarchy.ancestors_bfs(from: Edimar, to: Child))
     assert_nil(Hierarchy.ancestors_bfs(from: Child, to: Child))
   end
+
+  def test_readme_example
+    simulate('Book')
+    simulate('Page')
+    simulate('Line')
+    simulate('Word')
+    simulate('Letter')
+
+    Book.class_eval do
+      has_many :pages
+      has_many :words
+    end
+
+    Page.class_eval do
+      belongs_to :book
+      has_many :lines
+      has_many :words
+    end
+
+    Line.class_eval do
+      belongs_to :page
+      has_many :words
+    end
+
+    Word.class_eval do
+      belongs_to :line
+      belongs_to :page
+      belongs_to :book
+      has_many :letters
+    end
+
+    Letter.class_eval do
+      belongs_to :word
+    end
+
+    associations = [{:pages=>[{:lines=>[{:words=>[:letters]}]}, {:words=>[:letters]}]}, {:words=>[:letters]}]
+    assert_equal(Hierarchy.associations(Book), associations)
+
+    classes = [{"Page"=>[{"Line"=>[{"Word"=>["Letter"]}]}, {"Word"=>["Letter"]}]}, {"Word"=>["Letter"]}]
+    assert_equal(Hierarchy.classes(Book), classes)
+
+    classes_list = ["Page", "Line", "Word", "Letter"]
+    assert_equal(Hierarchy.classes_list(Book), classes_list)
+
+    all_ancestors = [{:word=>:book}, {:word=>{:page=>:book}}]
+    assert_equal(Hierarchy.all_ancestors(from: Letter, to: Book), all_ancestors)
+
+    ancestors_dfs = {:word=>{:line=>{:page=>:book}}}
+    assert_equal(Hierarchy.ancestors_dfs(from: Letter, to: Book), ancestors_dfs)
+
+    ancestors_bfs = {:word=>:book}
+    assert_equal(Hierarchy.ancestors_bfs(from: Letter, to: Book), ancestors_bfs)
+  end
 end

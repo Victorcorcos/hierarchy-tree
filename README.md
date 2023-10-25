@@ -80,16 +80,16 @@ end
 
 ```rb
 Hierarchy.associations(Book)
-# [:pages, {:lines=>[{:words=>[:letters]}]}, {:words=>[:letters]}, :letters]
+# [{:pages=>[{:lines=>[{:words=>[:letters]}]}, {:words=>[:letters]}]}, {:words=>[:letters]}]
 
 Hierarchy.classes(Book)
-# ["Page", {"Line"=>[{"Word"=>["Letter"]}]}, {"Word"=>["Letter"]}, "Letter"]
+# [{:pages=>[{:lines=>[{:words=>[:letters]}]}, {:words=>[:letters]}]}, {:words=>[:letters]}]
 
 Hierarchy.classes_list(Book)
 # ["Page", "Line", "Word", "Letter"]
 
 Hierarchy.all_ancestors(from: Letter, to: Book)
-# [{:word=>:book}, {:word=>{:page=>:book}}, {:word=>{:line=>{:page=>:book}}}]
+# [{:word=>:book}, {:word=>{:page=>:book}}]
 
 Hierarchy.ancestors_dfs(from: Letter, to: Book)
 # {:word=>{:line=>{:page=>:book}}}
