@@ -28,7 +28,7 @@ class Hierarchy
 
   # Return all the possible ancestors associations by navigating through :belongs_to
   # Starting from the "from" class towards the "to" class
-  def self.all_ancestors(from:, to:)
+  def self.ancestors(from:, to:)
     return [] if from == to
 
     queue = [{ class: from, path: [] }]

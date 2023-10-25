@@ -459,13 +459,13 @@ class TestHierarchyTree < Minitest::Test
   def test_all_ancestors
     setup_ancestors
 
-    assert_equal(Hierarchy.all_ancestors(from: Child, to: Parent1), [:parent1])
-    assert_equal(Hierarchy.all_ancestors(from: Child, to: Parent2), [:parent2])
-    assert_equal(Hierarchy.all_ancestors(from: Child, to: Parent3), [:parent3])
-    assert_equal(Hierarchy.all_ancestors(from: Child, to: GrandParent4), [{ parent1: :grand_parent4 }])
-    assert_equal(Hierarchy.all_ancestors(from: Child, to: GrandParent5), [{ parent2: :grand_parent5 }])
-    assert_equal(Hierarchy.all_ancestors(from: Child, to: GrandParent6), [{ parent3: :grand_parent6 }])
-    assert_equal(Hierarchy.all_ancestors(from: Child, to: God), [{ parent1: { grand_parent4: :god } }])
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent1), [:parent1])
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent2), [:parent2])
+    assert_equal(Hierarchy.ancestors(from: Child, to: Parent3), [:parent3])
+    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent4), [{ parent1: :grand_parent4 }])
+    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent5), [{ parent2: :grand_parent5 }])
+    assert_equal(Hierarchy.ancestors(from: Child, to: GrandParent6), [{ parent3: :grand_parent6 }])
+    assert_equal(Hierarchy.ancestors(from: Child, to: God), [{ parent1: { grand_parent4: :god } }])
 
     # Multiple Paths
     paths = [
@@ -473,10 +473,10 @@ class TestHierarchyTree < Minitest::Test
       { parent2: { grand_parent5: :edimar } },
       { parent1: { grand_parent4: { god: :edimar } } }
     ]
-    assert_equal(Hierarchy.all_ancestors(from: Child, to: Edimar), paths)
+    assert_equal(Hierarchy.ancestors(from: Child, to: Edimar), paths)
 
-    assert_equal(Hierarchy.all_ancestors(from: Edimar, to: Child), [])
-    assert_equal(Hierarchy.all_ancestors(from: Child, to: Child), [])
+    assert_equal(Hierarchy.ancestors(from: Edimar, to: Child), [])
+    assert_equal(Hierarchy.ancestors(from: Child, to: Child), [])
   end
 
   def test_ancestors_dfs
@@ -558,8 +558,8 @@ class TestHierarchyTree < Minitest::Test
     classes_list = ["Page", "Line", "Word", "Letter"]
     assert_equal(Hierarchy.classes_list(Book), classes_list)
 
-    all_ancestors = [{:word=>:book}, {:word=>{:page=>:book}}]
-    assert_equal(Hierarchy.all_ancestors(from: Letter, to: Book), all_ancestors)
+    ancestors = [{:word=>:book}, {:word=>{:page=>:book}}]
+    assert_equal(Hierarchy.ancestors(from: Letter, to: Book), ancestors)
 
     ancestors_dfs = {:word=>{:line=>{:page=>:book}}}
     assert_equal(Hierarchy.ancestors_dfs(from: Letter, to: Book), ancestors_dfs)

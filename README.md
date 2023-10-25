@@ -88,7 +88,7 @@ Hierarchy.classes(Book)
 Hierarchy.classes_list(Book)
 # ["Page", "Line", "Word", "Letter"]
 
-Hierarchy.all_ancestors(from: Letter, to: Book)
+Hierarchy.ancestors(from: Letter, to: Book)
 # [{:word=>:book}, {:word=>{:page=>:book}}]
 
 Hierarchy.ancestors_dfs(from: Letter, to: Book)
