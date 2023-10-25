@@ -38,7 +38,7 @@ require 'hierarchy_tree'
 Hierarchy.associations(YourClass) # Array of hashes of relations → Representing the hierarchy symbolized relations
 Hierarchy.classes_list(YourClass) # Array of classes → Just a list of descendant classes, without representing the relations
 Hierarchy.classes(YourClass)      # Array of hashes of classes → Representing the hierarchy of relations as stringified classes instead of symbolized relations
-Hierarchy.all_ancestors(from: ChildClass, to: AncestorClass) # Array of relations → Representing all the possible paths starting from the ChildClass until it reaches AncestorClass
+Hierarchy.ancestors(from: ChildClass, to: AncestorClass) # Array of relations → Representing all the possible paths starting from the ChildClass until it reaches AncestorClass
 Hierarchy.ancestors_dfs(from: ChildClass, to: AncestorClass) # Hash of relations → Representing the ancestors hierarchy starting from the ChildClass until it reaches AncestorClass searching by Depth First Search
 Hierarchy.ancestors_bfs(from: ChildClass, to: AncestorClass) # Hash of relations → Representing the ancestors hierarchy starting from the ChildClass until it reaches AncestorClass searching by Breadth First Search
 ```
@@ -89,7 +89,7 @@ Hierarchy.classes_list(Book)
 # ["Page", "Line", "Word", "Letter"]
 
 Hierarchy.ancestors(from: Letter, to: Book)
-# [{:word=>:book}, {:word=>{:page=>:book}}]
+# [{:word=>:book}, {:word=>{:page=>:book}}, {:word=>{:line=>{:page=>:book}}}]
 
 Hierarchy.ancestors_dfs(from: Letter, to: Book)
 # {:word=>{:line=>{:page=>:book}}}

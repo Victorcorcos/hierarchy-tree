@@ -29,10 +29,10 @@ class Hierarchy
   # Return all the possible ancestors associations by navigating through :belongs_to
   # Starting from the "from" class towards the "to" class
   def self.ancestors(from:, to:)
-    return [] if from == to
+    return [] if from.to_s == to.to_s
 
-    queue = [{ class: from, path: [] }]
-    visited = { from => [] }
+    queue = [{ class: from.to_s, path: [] }]
+    visited = { from.to_s => [] }
     paths = []
 
     while queue.any?
@@ -40,15 +40,13 @@ class Hierarchy
       current_class = current[:class]
       current_path = current[:path]
 
-      current_class.reflect_on_all_associations(:belongs_to).each do |relation|
-        next_class = relation.klass
+      current_class.constantize.reflect_on_all_associations(:belongs_to).each do |relation|
+        next_class = relation.klass.to_s
         next_path = current_path + [relation.name]
 
-        if next_class.to_s == to.to_s
-          paths << hashify(next_path)
-        end
+        paths << hashify(next_path) if next_class == to.to_s
 
-        if !visited.key?(next_class)
+        if next_path == next_path.uniq # Non-looped path
           visited[next_class] = next_path
           queue.push({ class: next_class, path: next_path })
         end
