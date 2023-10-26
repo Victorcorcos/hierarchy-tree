@@ -46,7 +46,7 @@ class Hierarchy
 
         paths << hashify(next_path) if next_class == to.to_s
 
-        if relation.class_name != from.name and next_path == next_path.uniq # Non-looped path
+        if non_looped_path?(from, to, relation, next_path)
           visited[next_class] = next_path
           queue.push({ class: next_class, path: next_path })
         end
@@ -187,6 +187,12 @@ class Hierarchy
     else
       { array.first => hashify(array.drop(1)) }
     end
+  end
+
+  def self.non_looped_path?(from, to, relation, next_path)
+    relation.class_name != from.name and
+      relation.class_name != to.name and
+      next_path == next_path.uniq
   end
 
   def self.valid_path?(path, target)
