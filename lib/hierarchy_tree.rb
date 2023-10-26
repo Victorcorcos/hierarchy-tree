@@ -41,6 +41,8 @@ class Hierarchy
       current_path = current[:path]
 
       current_class.constantize.reflect_on_all_associations(:belongs_to).each do |relation|
+        next if relation.options[:polymorphic]
+
         next_class = relation.klass.to_s
         next_path = current_path + [relation.name]
 
@@ -71,6 +73,8 @@ class Hierarchy
       current_path = current[:path]
 
       current_class.reflect_on_all_associations(:belongs_to).each do |relation|
+        next if relation.options[:polymorphic]
+
         next_class = relation.klass
         next_path = current_path + [relation.name]
 

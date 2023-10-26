@@ -125,6 +125,44 @@ The result is...
 - letters
 ```
 
+## Polymorphic Relations 👨‍👩‍👧‍👦
+
+In case there are polymorphic relations in your database and you want to discover the ancestors path(s) between these classes including the polymorphic relations, you need to explicitly setup the `belongs_to` association to each class the polymorphic relation is associated.
+
+So, if you have a polymorphic relation like this one for example:
+
+```rb
+class Request
+end
+
+class Scope
+end
+
+class Progress
+end
+
+class Inspection < ActiveRecord::Base
+  belongs_to :inspected, polymorphic: true, optional: true
+  # inspected_type = "Request" or "Scope" or "Progress"
+end
+```
+
+You need to explicitly add the `belongs_to` associations related with these models, following the instructions of [**this answer**](https://stackoverflow.com/a/16124295/7644846).
+
+```rb
+class Inspection < ActiveRecord::Base
+  belongs_to :request, -> { where(inspections: { inspected_type: 'Request' }) },
+             foreign_key: 'inspected_id', optional: true, inverse_of: :inspections
+  belongs_to :scope, -> { where(inspections: { inspected_type: 'Scope' }) },
+             foreign_key: 'inspected_id', optional: true, inverse_of: :inspections
+  belongs_to :progress, -> { where(inspections: { inspected_type: 'Progress' }) },
+             foreign_key: 'inspected_id', optional: true, inverse_of: :inspections
+end
+```
+
+By this manner, the `hierarchy-tree` gem will consider the polymorphic relations inside the paths discovery. 🚀
+
+
 ## Contact
 
 * [Victor Cordeiro Costa](https://www.linkedin.com/in/victor-costa-0bba7197/)
