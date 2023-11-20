@@ -26,6 +26,14 @@ class Hierarchy
     @classes_list
   end
 
+  # Return the array of children classes in a bottom up manner
+  # From leaf classes to upper classes
+  def self.bottom_up_classes(klass)
+    @classes_list = []
+    build_descendants(klass)
+    topological_sort([klass.to_s] + @classes_list)
+  end
+
   # Return all the possible ancestors associations by navigating through :belongs_to
   # Starting from the "from" class towards the "to" class
   def self.ancestors(from:, to:)
@@ -188,6 +196,27 @@ class Hierarchy
       dfs_descendants(child_opts, child_name)
     end
     true
+  end
+
+  def self.topological_sort(classes)
+    dependencies = classes.to_h do |c|
+      [c, Hierarchy.ancestors_bfs(from: c.constantize, to: classes[0].constantize, classify: true)]
+    end
+
+    sorted_items = []
+    visited = {}
+
+    visit = lambda do |item|
+      unless visited[item]
+        visited[item] = true
+        dependencies[item]&.each { |dependency| visit.call(dependency) }
+        sorted_items.unshift(item)
+      end
+    end
+
+    classes.each { |item| visit.call(item) unless visited[item] }
+
+    sorted_items
   end
 
   def self.hashify(array)
