@@ -429,6 +429,81 @@ class TestHierarchyTree < Minitest::Test
     assert_equal(Hierarchy.loop?(Husband), false)
   end
 
+  def setup_for_bottom_up
+    simulate('Child')
+    simulate('Parent1')
+    simulate('Parent2')
+    simulate('Parent3')
+    simulate('GrandParent4')
+    simulate('GrandParent5')
+    simulate('GrandParent6')
+    simulate('God')
+    simulate('Edimar')
+
+    # Child ➙ Parent1 ➙ GrandParent4 ➙ God ─↘
+    #       ↳ Parent2 ➙ GrandParent5 ───────➙ Edimar
+    #       ↳ Parent3 ➙ GrandParent6 ↺ Child
+    #               ∟───────────────────────➚
+
+    Child.class_eval do
+      belongs_to :parent1
+      belongs_to :parent2
+      belongs_to :parent3
+      has_one :grand_parent6
+    end
+
+    Parent1.class_eval do
+      has_one :child
+      belongs_to :grand_parent4
+    end
+
+    Parent2.class_eval do
+      has_one :child
+      belongs_to :grand_parent5
+    end
+
+    Parent3.class_eval do
+      has_one :child
+      belongs_to :grand_parent6
+      belongs_to :edimar
+    end
+
+    GrandParent4.class_eval do
+      has_one :parent1
+      belongs_to :god
+    end
+
+    GrandParent5.class_eval do
+      has_one :parent2
+      belongs_to :edimar
+    end
+
+    GrandParent6.class_eval do
+      has_one :parent3
+      belongs_to :child
+    end
+
+    God.class_eval do
+      has_one :grand_parent4
+      belongs_to :edimar
+    end
+
+    Edimar.class_eval do
+      has_one :god
+      has_one :grand_parent5
+      has_one :parent3
+    end
+  end
+
+  def test_bottom_up_classes
+    setup_for_bottom_up
+
+    Hierarchy.bottom_up_classes(Edimar)
+
+    bottom_up_classes = %w[Parent2 GrandParent5 GrandParent6 Child Parent3 Parent1 GrandParent4 God Edimar]
+    assert_equal(Hierarchy.bottom_up_classes(Edimar), bottom_up_classes)
+  end
+
   def setup_ancestors
     simulate('Child')
     simulate('Parent1')
@@ -555,8 +630,11 @@ class TestHierarchyTree < Minitest::Test
     classes = [{"Page"=>[{"Line"=>[{"Word"=>["Letter"]}]}, {"Word"=>["Letter"]}]}, {"Word"=>["Letter"]}]
     assert_equal(Hierarchy.classes(Book), classes)
 
-    classes_list = ["Page", "Line", "Word", "Letter"]
+    classes_list = %w[Page Line Word Letter]
     assert_equal(Hierarchy.classes_list(Book), classes_list)
+
+    bottom_up_classes = %w[Letter Word Line Page Book]
+    assert_equal(Hierarchy.bottom_up_classes(Book), bottom_up_classes)
 
     ancestors = [{:word=>:book}, {:word=>{:page=>:book}}, {:word=>{:line=>{:page=>:book}}}]
     assert_equal(Hierarchy.ancestors(from: Letter, to: Book), ancestors)
