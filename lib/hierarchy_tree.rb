@@ -61,7 +61,7 @@ class Hierarchy
   # Return the ancestors associations by navigating through :belongs_to
   # Starting from the "from" class towards the "to" class
   # Using BFS - Breadth First Search, thus finding the Shortest Path
-  def self.ancestors_bfs(from:, to:)
+  def self.ancestors_bfs(from:, to:, classify: false)
     return if from == to
 
     queue = [{ class: from, path: [] }]
@@ -76,9 +76,14 @@ class Hierarchy
         next if relation.options[:polymorphic]
 
         next_class = relation.klass
-        next_path = current_path + [relation.name]
 
-        return hashify(next_path) if next_class.to_s == to.to_s
+        if classify # An array of classes
+          next_path = current_path + [relation.klass.to_s]
+          return next_path if next_class.to_s == to.to_s
+        else # A hash of associations
+          next_path = current_path + [relation.name]
+          return hashify(next_path) if next_class.to_s == to.to_s
+        end
 
         if visited.exclude?(next_class)
           visited << next_class
