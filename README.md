@@ -35,12 +35,29 @@ gem 'hierarchy-tree'
 ```rb
 require 'hierarchy_tree'
 
-Hierarchy.associations(YourClass) # Array of hashes of relations → Representing the hierarchy symbolized relations
-Hierarchy.classes_list(YourClass) # Array of classes → Just a list of descendant classes, without representing the relations
-Hierarchy.classes(YourClass)      # Array of hashes of classes → Representing the hierarchy of relations as stringified classes instead of symbolized relations
-Hierarchy.ancestors(from: ChildClass, to: AncestorClass) # Array of relations → Representing all the possible paths starting from the ChildClass until it reaches AncestorClass
-Hierarchy.ancestors_dfs(from: ChildClass, to: AncestorClass) # Hash of relations → Representing the ancestors hierarchy starting from the ChildClass until it reaches AncestorClass searching by Depth First Search
-Hierarchy.ancestors_bfs(from: ChildClass, to: AncestorClass) # Hash of relations → Representing the ancestors hierarchy starting from the ChildClass until it reaches AncestorClass searching by Breadth First Search
+# Array of hashes of relations → Representing the hierarchy symbolized relations
+Hierarchy.associations(YourClass)
+
+# Array of hashes of classes → Representing the hierarchy of relations as stringified classes instead of symbolized relations
+Hierarchy.classes(YourClass)
+
+# Array of classes → Just a list of descendant classes, without representing the relations
+Hierarchy.classes_list(YourClass)
+
+# Output the classes from leaves to root by using topological sorting
+Hierarchy.bottom_up_classes(YourClass)
+
+# Array of relations → Representing all the possible paths starting from the ChildClass until it reaches AncestorClass
+Hierarchy.ancestors(from: ChildClass, to: AncestorClass)
+
+# Hash of relations → Representing the ancestors hierarchy starting from the ChildClass until it reaches AncestorClass searching by Depth First Search
+Hierarchy.ancestors_dfs(from: ChildClass, to: AncestorClass)
+
+# Hash of relations → Representing the ancestors hierarchy starting from the ChildClass until it reaches AncestorClass searching by Breadth First Search
+Hierarchy.ancestors_bfs(from: ChildClass, to: AncestorClass)
+
+# Same as above, but returning an array of classes
+Hierarchy.ancestors_bfs(from: ChildClass, to: AncestorClass, classify: true)
 ```
 
 ## Example
@@ -87,6 +104,9 @@ Hierarchy.classes(Book)
 
 Hierarchy.classes_list(Book)
 # ["Page", "Line", "Word", "Letter"]
+
+Hierarchy.bottom_up_classes(Book)
+# ["Letter", "Word", "Line", "Page", "Book"]
 
 Hierarchy.ancestors(from: Letter, to: Book)
 # [{:word=>:book}, {:word=>{:page=>:book}}, {:word=>{:line=>{:page=>:book}}}]
