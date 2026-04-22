@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.imgur.com/OejGP57.png" alt="Hierarchy Tree Logo" width="40%" />
+  <img src="https://i.imgur.com/HR4PANP.png" alt="Hierarchy Tree Logo" width="40%" />
 </p>
 
 <p align="center">
